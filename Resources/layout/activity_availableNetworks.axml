@@ -26,5 +26,18 @@
         android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"
         android:foregroundGravity="bottom|clip_horizontal|clip_vertical|fill|center|fill_horizontal|center_horizontal|center_vertical|right|left|top|fill_vertical" />
+   <ListView
+      android:id = "@+id/wifiList"
+      android:layout_width = "match_parent"
+      android:layout_height = "match_parent"
+      android:layout_above = "@+id/scanBtn" />
+   <Button
+      android:id = "@+id/scanBtn"
+      android:layout_width = "match_parent"
+      android:layout_height = "50dp"
+      android:layout_alignParentBottom = "true"
+      android:layout_gravity = "bottom"
+      android:layout_margin = "60dp"
+      android:text = "Scan WiFi" />
 
 </RelativeLayout>

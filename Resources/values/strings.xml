@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Social_Network_App</string>
+    <string name="app_name">Social network App</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_availablenetworks">Available Networks</string>
+    <string name="title_ownnetwork">Create Own Network</string>
 </resources>
