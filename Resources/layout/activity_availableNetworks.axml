@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
     <TextView
         android:id="@+id/message"
@@ -14,7 +15,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="@string/title_home" />
+        android:text="@string/press_btn_available" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
@@ -26,18 +27,18 @@
         android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"
         android:foregroundGravity="bottom|clip_horizontal|clip_vertical|fill|center|fill_horizontal|center_horizontal|center_vertical|right|left|top|fill_vertical" />
-   <ListView
-      android:id = "@+id/wifiList"
-      android:layout_width = "match_parent"
-      android:layout_height = "match_parent"
-      android:layout_above = "@+id/scanBtn" />
-   <Button
-      android:id = "@+id/scanBtn"
-      android:layout_width = "match_parent"
-      android:layout_height = "50dp"
-      android:layout_alignParentBottom = "true"
-      android:layout_gravity = "bottom"
-      android:layout_margin = "60dp"
-      android:text = "Scan WiFi" />
+    <ListView
+        android:id = "@+id/wifiList"
+        android:layout_width = "match_parent"
+        android:layout_height = "match_parent"
+        android:layout_above = "@+id/scanBtn" />
+    <Button
+        android:id = "@+id/scanBtn"
+        android:layout_width = "match_parent"
+        android:layout_height = "50dp"
+        android:layout_alignParentBottom = "true"
+        android:layout_gravity = "bottom"
+        android:layout_margin = "60dp"
+        android:text = "Scan for available networks" />
 
 </RelativeLayout>

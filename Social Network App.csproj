@@ -66,6 +66,8 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HotSpotCallback.cs" />
+    <Compile Include="LocalHotspot.cs" />
     <Compile Include="CreateOwnNetworkActivity.cs" />
     <Compile Include="AvailableNetworksActivity.cs" />
     <Compile Include="MainActivity.cs" />

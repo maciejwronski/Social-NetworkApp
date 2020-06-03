@@ -19,7 +19,7 @@ namespace Social_Network_App
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
-            RequestPermissions(Utils.Permissions, 0);
+            RequestPermissions(Utils.RequiredWifiPermissions, 0);
             textMessage = FindViewById<TextView>(Resource.Id.message);
             BottomNavigationView navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
             navigation.SetOnNavigationItemSelectedListener(this);

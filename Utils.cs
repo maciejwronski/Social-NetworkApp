@@ -16,7 +16,12 @@ namespace Social_Network_App
 {
     public static class Utils
     {
-        public static readonly string[] Permissions = {
+        public enum ePermission
+        {
+            LocationPermission,
+            WifiPermission
+        }
+        public static readonly string[] RequiredWifiPermissions = {
             Android.Manifest.Permission.ChangeWifiMulticastState,
             Android.Manifest.Permission.AccessWifiState,
             Android.Manifest.Permission.ChangeWifiState
@@ -71,6 +76,19 @@ namespace Social_Network_App
             {
             }
             return permissionsGranted;
+        }
+        public static bool HasPermission(Context context, ePermission permission)
+        {
+            switch (permission)
+            {
+                case ePermission.WifiPermission:
+                    return (context.CheckSelfPermission(Android.Manifest.Permission.ChangeWifiMulticastState) == Android.Content.PM.Permission.Granted) &&
+                           (context.CheckSelfPermission(Android.Manifest.Permission.AccessWifiState) == Android.Content.PM.Permission.Granted) &&
+                           (context.CheckSelfPermission(Android.Manifest.Permission.ChangeWifiState) == Android.Content.PM.Permission.Granted);
+                case ePermission.LocationPermission:
+                    return context.CheckSelfPermission(Android.Manifest.Permission.AccessFineLocation) == Android.Content.PM.Permission.Granted;
+            }
+            return false;
         }
     }
 }

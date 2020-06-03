@@ -21,11 +21,6 @@ namespace Social_Network_App
 
     public class AvailableNetworksActivity : AppCompatActivity, BottomNavigationView.IOnNavigationItemSelectedListener
     {
-        private enum Permission
-        {
-            LocationPermission,
-            WifiPermission
-        }
         private TextView textMessage;
         private ListView wifiList;
         private WifiManager wifiManager;
@@ -46,10 +41,10 @@ namespace Social_Network_App
             wifiManager = (WifiManager)ApplicationContext.GetSystemService(Context.WifiService);
             wifiReceiver = new WifiReceiver(wifiManager, wifiList);
 
-            if (!HasPermission(Permission.WifiPermission))
+            if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.WifiPermission))
             {
                 Toast.MakeText(ApplicationContext, "Application requires permission to Wi-Fi.", ToastLength.Long).Show();
-                RequestPermissions(Utils.Permissions, 0);
+                RequestPermissions(Utils.RequiredWifiPermissions, 0);
             }
             else
             {
@@ -60,7 +55,7 @@ namespace Social_Network_App
                 }
                 buttonScan.Click += delegate
                 {
-                    if (!HasPermission(Permission.LocationPermission))
+                    if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.LocationPermission))
                     {
                         var GetPermissions = Utils.GetPermissions();
                     }
@@ -102,19 +97,6 @@ namespace Social_Network_App
                     Finish();
                     StartActivity(typeof(CreateOwnNetworkActivity));
                     return true;
-            }
-            return false;
-        }
-        bool HasPermission(Permission permission)
-        {
-            switch (permission)
-            {
-                case Permission.WifiPermission:
-                    return (ApplicationContext.CheckSelfPermission(Android.Manifest.Permission.ChangeWifiMulticastState) == Android.Content.PM.Permission.Granted) &&
-                           (ApplicationContext.CheckSelfPermission(Android.Manifest.Permission.AccessWifiState) == Android.Content.PM.Permission.Granted) &&
-                           (ApplicationContext.CheckSelfPermission(Android.Manifest.Permission.ChangeWifiState) == Android.Content.PM.Permission.Granted);
-                case Permission.LocationPermission:
-                    return ApplicationContext.CheckSelfPermission(Android.Manifest.Permission.AccessFineLocation) == Android.Content.PM.Permission.Granted;
             }
             return false;
         }
