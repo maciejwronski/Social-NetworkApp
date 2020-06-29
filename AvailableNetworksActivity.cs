@@ -37,7 +37,9 @@ namespace Social_Network_App
             GetIDs();
 
             navigation.SetOnNavigationItemSelectedListener(this);
-
+            var menu = navigation.Menu;
+            var menuItem = menu.GetItem(1);
+            menuItem.SetChecked(true);
             wifiManager = (WifiManager)ApplicationContext.GetSystemService(Context.WifiService);
             wifiReceiver = new WifiReceiver(wifiManager, wifiList);
 

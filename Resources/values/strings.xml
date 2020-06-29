@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Social network App</string>
     <string name="title_home">Home</string>
-    <string name="title_availablenetworks">Available Networks</string>
-    <string name="title_ownnetwork">Create Own Network</string>
+    <string name="title_availablenetworks">Join Network</string>
+    <string name="title_ownnetwork">Own Network</string>
 
    <string name="press_btn_available">Press button to show available networks</string>
-   <string name="press_btn_ownnetwork">Press Button to create own network</string>
+   <string name="press_btn_ownnetwork">Press button to create own network</string>
 </resources>

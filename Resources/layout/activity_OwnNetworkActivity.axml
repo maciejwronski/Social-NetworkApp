@@ -21,20 +21,19 @@
         android:id="@+id/navigation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
+        android:layout_marginEnd="-10dp"
+        android:layout_marginStart="-30dp"
         android:background="?android:attr/windowBackground"
         android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"
         android:foregroundGravity="bottom|clip_horizontal|clip_vertical|fill|center|fill_horizontal|center_horizontal|center_vertical|right|left|top|fill_vertical"/>
     <Button
         android:id="@+id/hotspotBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
-        android:layout_centerInParent="true"
-        android:layout_below="@id/message"
+        android:layout_width = "match_parent"
+        android:layout_height = "50dp"
+        android:layout_alignParentBottom = "true"
+        android:layout_gravity = "bottom"
+        android:layout_margin = "60dp"
         android:text="Create Own Network"
     />
 </RelativeLayout>

@@ -12,6 +12,7 @@ using Android.Net.Wifi;
 using Xamarin.Essentials;
 using Plugin.Permissions;
 using Plugin.CurrentActivity;
+using Java.Lang.Reflect;
 
 namespace Social_Network_App
 {
@@ -52,6 +53,7 @@ namespace Social_Network_App
             }
             catch(Exception s)
             {
+                Console.WriteLine("exception: " + s.Message);
                 return false;
             }
             return true;

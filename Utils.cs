@@ -19,8 +19,15 @@ namespace Social_Network_App
         public enum ePermission
         {
             LocationPermission,
-            WifiPermission
+            WifiPermission,
+            HotSpotPermission
         }
+        public static readonly string[] RequiredHotSpotPermissions =    {
+            Android.Manifest.Permission.AccessFineLocation,
+            Android.Manifest.Permission.ChangeWifiState,
+            Android.Manifest.Permission.ChangeNetworkState,
+            Android.Manifest.Permission.AccessNetworkState
+        };
         public static readonly string[] RequiredWifiPermissions = {
             Android.Manifest.Permission.ChangeWifiMulticastState,
             Android.Manifest.Permission.AccessWifiState,
@@ -87,6 +94,11 @@ namespace Social_Network_App
                            (context.CheckSelfPermission(Android.Manifest.Permission.ChangeWifiState) == Android.Content.PM.Permission.Granted);
                 case ePermission.LocationPermission:
                     return context.CheckSelfPermission(Android.Manifest.Permission.AccessFineLocation) == Android.Content.PM.Permission.Granted;
+                case ePermission.HotSpotPermission:
+                    return (context.CheckSelfPermission(Android.Manifest.Permission.AccessFineLocation) == Android.Content.PM.Permission.Granted) &&
+       (context.CheckSelfPermission(Android.Manifest.Permission.ChangeWifiState) == Android.Content.PM.Permission.Granted) &&
+              (context.CheckSelfPermission(Android.Manifest.Permission.ChangeNetworkState) == Android.Content.PM.Permission.Granted) &&
+                            (context.CheckSelfPermission(Android.Manifest.Permission.AccessNetworkState) == Android.Content.PM.Permission.Granted);
             }
             return false;
         }

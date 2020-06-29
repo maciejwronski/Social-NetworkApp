@@ -23,6 +23,10 @@ namespace Social_Network_App
             textMessage = FindViewById<TextView>(Resource.Id.message);
             BottomNavigationView navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
             navigation.SetOnNavigationItemSelectedListener(this);
+            var menu = navigation.Menu;
+            var menuItem = menu.GetItem(0);
+            menuItem.SetChecked(true);
+
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {

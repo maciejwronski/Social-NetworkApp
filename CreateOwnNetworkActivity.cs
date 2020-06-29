@@ -33,34 +33,38 @@ namespace Social_Network_App
             textMessage = FindViewById<TextView>(Resource.Id.message);
             BottomNavigationView navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
             navigation.SetOnNavigationItemSelectedListener(this);
+            var menu = navigation.Menu;
+            var menuItem = menu.GetItem(2);
+            menuItem.SetChecked(true);
             wifiManager = (WifiManager)ApplicationContext.GetSystemService(Context.WifiService);
             buttonHotspot = FindViewById<Button>(Resource.Id.hotspotBtn);
-            if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.WifiPermission))
+
+            SetWifiDelegate();
+        }
+        void SetWifiDelegate()
+        {
+
+            buttonHotspot.Click += delegate
             {
-                Toast.MakeText(ApplicationContext, "Application requires permission to Wi-Fi.", ToastLength.Long).Show();
-                RequestPermissions(Utils.RequiredWifiPermissions, 0);
-            }
-            else
-            {
-                if (!wifiManager.IsWifiEnabled)
+                if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.HotSpotPermission))
                 {
-                    Toast.MakeText(ApplicationContext, "Turning WiFi ON...", ToastLength.Long).Show();
-                    wifiManager.SetWifiEnabled(true);
+                    Toast.MakeText(ApplicationContext, "Application requires some HotSpotPermissions!.", ToastLength.Long).Show();
+                    RequestPermissions(Utils.RequiredHotSpotPermissions, 0);
+                    return;
                 }
-                buttonHotspot.Click += delegate
+                if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.LocationPermission))
                 {
-                    if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.LocationPermission))
-                    {
-                        var GetPermissions = Utils.GetPermissions();
-                    }
-                    else
-                    {
-                        LocalHotspot localHotspot = new LocalHotspot(ApplicationContext);
-                        localHotspot.SetConfig("Nowe wifi");
-                        localHotspot.SetNetworkState(true);
-                    }
-                };
-            }
+                    var GetPermissions = Utils.GetPermissions();
+                }
+                else
+                {
+                    if (wifiManager.IsWifiEnabled)
+                        wifiManager.SetWifiEnabled(false);
+                    LocalHotspot localHotspot = new LocalHotspot(ApplicationContext);
+                    localHotspot.SetConfig("Nowe wifi");
+                    localHotspot.SetNetworkState(true);
+                }
+            };
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
