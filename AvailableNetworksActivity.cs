@@ -14,6 +14,7 @@ using Android.Net.Wifi;
 using Xamarin.Essentials;
 using Plugin.Permissions;
 using Plugin.CurrentActivity;
+using System.Threading.Tasks;
 
 namespace Social_Network_App
 {
@@ -25,7 +26,8 @@ namespace Social_Network_App
         private ListView wifiList;
         private WifiManager wifiManager;
         private WifiReceiver wifiReceiver;
-        private Button buttonScan;
+        private Button buttonWifiScanner;
+        private Button buttonReceiveMessage;
         private BottomNavigationView navigation;
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -34,7 +36,7 @@ namespace Social_Network_App
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_availableNetworks);
 
-            GetIDs();
+            GetIDsAndPrepareDelegates();
 
             navigation.SetOnNavigationItemSelectedListener(this);
             var menu = navigation.Menu;
@@ -42,40 +44,21 @@ namespace Social_Network_App
             menuItem.SetChecked(true);
             wifiManager = (WifiManager)ApplicationContext.GetSystemService(Context.WifiService);
             wifiReceiver = new WifiReceiver(wifiManager, wifiList);
-
-            if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.WifiPermission))
-            {
-                Toast.MakeText(ApplicationContext, "Application requires permission to Wi-Fi.", ToastLength.Long).Show();
-                RequestPermissions(Utils.RequiredWifiPermissions, 0);
-            }
-            else
-            {
-                if (!wifiManager.IsWifiEnabled)
-                {
-                    Toast.MakeText(ApplicationContext, "Turning WiFi ON...", ToastLength.Long).Show();
-                    wifiManager.SetWifiEnabled(true);
-                }
-                buttonScan.Click += delegate
-                {
-                    if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.LocationPermission))
-                    {
-                        var GetPermissions = Utils.GetPermissions();
-                    }
-                    else
-                    {
-                        Toast.MakeText(ApplicationContext, "Searching for Wi-fi...", ToastLength.Long).Show();
-                        RegisterReceiver(wifiReceiver, new IntentFilter(WifiManager.ScanResultsAvailableAction));
-                        wifiManager.StartScan();
-                    }
-                };
-            }
         }
-
-        private void GetIDs()
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            buttonWifiScanner.Click -= OnAvailableWifiButtonClick;
+            buttonReceiveMessage.Click -= OnStartListeningButtonClick;
+        }
+        private void GetIDsAndPrepareDelegates()
         {
             textMessage = FindViewById<TextView>(Resource.Id.message);
             wifiList = FindViewById<ListView>(Resource.Id.wifiList);
-            buttonScan = FindViewById<Button>(Resource.Id.scanBtn);
+            buttonWifiScanner = FindViewById<Button>(Resource.Id.scanBtn);
+            buttonReceiveMessage = FindViewById<Button>(Resource.Id.ReceiveMessageButton);
+            buttonWifiScanner.Click += OnAvailableWifiButtonClick;
+            buttonReceiveMessage.Click += OnStartListeningButtonClick;
             navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
         }
 
@@ -101,6 +84,64 @@ namespace Social_Network_App
                     return true;
             }
             return false;
+        }
+        public void OnAvailableWifiButtonClick(object sender, System.EventArgs e)
+        {
+            if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.WifiPermission))
+            {
+                Toast.MakeText(ApplicationContext, "Application requires permission to Wi-Fi.", ToastLength.Long).Show();
+                RequestPermissions(Utils.RequiredWifiPermissions, 0);
+            }
+            else
+            {
+                if (!wifiManager.IsWifiEnabled)
+                {
+                    Toast.MakeText(ApplicationContext, "Turning WiFi ON...", ToastLength.Long).Show();
+                    wifiManager.SetWifiEnabled(true);
+                }
+                if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.LocationPermission))
+                {
+                    var GetPermissions = Utils.GetPermissions();
+                }
+                else
+                {
+                    textMessage.Visibility = ViewStates.Invisible;
+                    Toast.MakeText(ApplicationContext, "Searching for Wi-fi...", ToastLength.Long).Show();
+                    RegisterReceiver(wifiReceiver, new IntentFilter(WifiManager.ScanResultsAvailableAction));
+                    wifiManager.StartScan();
+                }
+            }
+        }
+        public void OnStartListeningButtonClick(object sender, System.EventArgs e)
+        {
+            if (CheckWifiOnAndConnected())
+            {
+                MessageReceiver messageSender = new MessageReceiver();
+                Task<System.Net.Sockets.UdpReceiveResult> task = Task.Run<System.Net.Sockets.UdpReceiveResult>(async () => await messageSender.StartListening(ApplicationContext));
+            }
+            else
+            {
+                Toast.MakeText(ApplicationContext, "Connect to any wi-fi first!", ToastLength.Long);
+            }
+        }
+        private bool CheckWifiOnAndConnected()
+        {
+            WifiManager wifiMgr = (WifiManager)GetSystemService(Context.WifiService);
+
+            if (wifiMgr.IsWifiEnabled)
+            {
+                WifiInfo wifiInfo = wifiMgr.ConnectionInfo;
+
+                if (wifiInfo.NetworkId == -1)
+                {
+                    return false;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

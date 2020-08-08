@@ -31,7 +31,8 @@
         android:id = "@+id/wifiList"
         android:layout_width = "match_parent"
         android:layout_height = "match_parent"
-        android:layout_above = "@+id/scanBtn" />
+        android:layout_above = "@+id/scanBtn"
+        android:scrollIndicators="none|bottom|top|left|right|start|end" />
     <Button
         android:id = "@+id/scanBtn"
         android:layout_width = "match_parent"
@@ -39,6 +40,19 @@
         android:layout_alignParentBottom = "true"
         android:layout_gravity = "bottom"
         android:layout_margin = "60dp"
-        android:text = "Scan for available networks" />
-
+        android:text = "Scan for available networks"
+        android:onClick="OnAvailableWifiButtonClick"
+        android:visibility="visible"
+        android:clickable="true" />
+    <Button
+        android:id="@+id/ReceiveMessageButton"
+        android:layout_width = "match_parent"
+        android:layout_height = "50dp"
+        android:layout_alignParentBottom = "false"
+        android:layout_gravity = "center"
+        android:layout_margin = "60dp"
+        android:text="Receive Message"
+        android:onClick="OnStartListeningButtonClick"
+        android:visibility="visible" 
+    />
 </RelativeLayout>

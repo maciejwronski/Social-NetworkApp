@@ -16,6 +16,7 @@ namespace Social_Network_App
 {
     public static class Utils
     {
+        public static int Port = 11000;
         public enum ePermission
         {
             LocationPermission,

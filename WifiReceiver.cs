@@ -35,7 +35,7 @@ namespace Social_Network_App
                 foreach (ScanResult scanResult in wifiList)
                 {
                     sb.Append("\n").Append(scanResult.Ssid).Append(" - ").Append(scanResult.Capabilities);
-                    deviceList.Add(scanResult.Ssid + " - " + scanResult.Capabilities);
+                    deviceList.Add(scanResult.Ssid);
                 }
                 String concatenatedText = sb.ToString();
                 ArrayAdapter arrayAdapter = new ArrayAdapter(context, Android.Resource.Layout.SimpleExpandableListItem1, deviceList.ToArray());

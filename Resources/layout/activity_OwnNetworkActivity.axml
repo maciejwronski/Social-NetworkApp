@@ -26,7 +26,11 @@
         android:background="?android:attr/windowBackground"
         android:layout_alignParentBottom="true"
         app:menu="@menu/navigation"
-        android:foregroundGravity="bottom|clip_horizontal|clip_vertical|fill|center|fill_horizontal|center_horizontal|center_vertical|right|left|top|fill_vertical"/>
+        android:foregroundGravity="bottom|clip_horizontal|clip_vertical|fill|center|fill_horizontal|center_horizontal|center_vertical|right|left|top|fill_vertical"
+        android:minWidth="25px"
+        android:minHeight="25px">
+
+    </android.support.design.widget.BottomNavigationView>
     <Button
         android:id="@+id/hotspotBtn"
         android:layout_width = "match_parent"
@@ -35,5 +39,17 @@
         android:layout_gravity = "bottom"
         android:layout_margin = "60dp"
         android:text="Create Own Network"
+        android:onClick="OnCreateNetworkButtonClick" 
+    />
+    <Button
+        android:id="@+id/SendMessageButton"
+        android:layout_width = "match_parent"
+        android:layout_height = "50dp"
+        android:layout_alignParentBottom = "false"
+        android:layout_gravity = "center"
+        android:layout_margin = "60dp"
+        android:text="Send Message"
+        android:onClick="OnMessageSendButtonClick"
+        android:visibility="invisible" 
     />
 </RelativeLayout>
