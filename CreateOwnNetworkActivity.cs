@@ -33,14 +33,21 @@ namespace Social_Network_App
             base.OnCreate(savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_OwnNetworkActivity);
-
-            textMessage = FindViewById<TextView>(Resource.Id.message);
-
             BottomNavigationView navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
             navigation.SetOnNavigationItemSelectedListener(this);
             var menu = navigation.Menu;
             var menuItem = menu.GetItem(2);
             menuItem.SetChecked(true);
+            AttachCallbacksAndIDs();
+        }
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            DettachCallbacks();
+        }
+        private void AttachCallbacksAndIDs()
+        {
+            textMessage = FindViewById<TextView>(Resource.Id.message);
             wifiManager = (WifiManager)ApplicationContext.GetSystemService(Context.WifiService);
             buttonCreateHotspot = FindViewById<Button>(Resource.Id.hotspotBtn);
             buttonSendMessage = FindViewById<Button>(Resource.Id.SendMessageButton);
@@ -48,9 +55,8 @@ namespace Social_Network_App
             buttonSendMessage.Click += OnMessageSendButtonClick;
             LocalHotspot.StateChange += OnHotspotStateChange;
         }
-        protected override void OnDestroy()
+        private void DettachCallbacks()
         {
-            base.OnDestroy();
             buttonCreateHotspot.Click -= OnCreateNetworkButtonClick;
             buttonSendMessage.Click -= OnMessageSendButtonClick;
             LocalHotspot.StateChange -= OnHotspotStateChange;

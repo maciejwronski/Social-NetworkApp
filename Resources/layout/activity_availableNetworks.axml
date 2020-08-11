@@ -29,10 +29,11 @@
         android:foregroundGravity="bottom|clip_horizontal|clip_vertical|fill|center|fill_horizontal|center_horizontal|center_vertical|right|left|top|fill_vertical" />
     <ListView
         android:id = "@+id/wifiList"
-        android:layout_width = "match_parent"
-        android:layout_height = "match_parent"
-        android:layout_above = "@+id/scanBtn"
-        android:scrollIndicators="none|bottom|top|left|right|start|end" />
+        android:layout_width = "204.5dp"
+        android:layout_height = "433.5dp"
+        android:scrollIndicators="none|bottom|top|left|right|start|end"
+        android:layout_marginTop="120.0dp"
+        android:layout_marginBottom="120.0dp" />
     <Button
         android:id = "@+id/scanBtn"
         android:layout_width = "match_parent"
@@ -55,4 +56,21 @@
         android:onClick="OnStartListeningButtonClick"
         android:visibility="visible" 
     />
+    <EditText
+        android:inputType="textPassword"
+        android:layout_width="94.0dp"
+        android:layout_marginTop = "200.0dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/wifiList"
+        android:id="@+id/passwordText"
+        android:visibility="invisible"  />
+    <Button
+        android:text="Connect"
+        android:layout_marginBottom = "-70.0dp"
+        android:layout_marginLeft = "250.0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/message"
+        android:id="@+id/wifiConnect"
+        android:visibility="invisible"  />
 </RelativeLayout>

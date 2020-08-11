@@ -16,7 +16,7 @@ namespace Social_Network_App
 {
     public static class Utils
     {
-        public static int Port = 11000;
+        public static int Port = 15000;
         public enum ePermission
         {
             LocationPermission,
@@ -34,6 +34,23 @@ namespace Social_Network_App
             Android.Manifest.Permission.AccessWifiState,
             Android.Manifest.Permission.ChangeWifiState
         };
+        public static bool CheckWifiOnAndConnected(Android.Net.Wifi.WifiManager wifiManager)
+        {
+            if (wifiManager.IsWifiEnabled)
+            {
+                Android.Net.Wifi.WifiInfo wifiInfo = wifiManager.ConnectionInfo;
+
+                if (wifiInfo.NetworkId == -1)
+                {
+                    return false;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public static async Task<bool> GetPermissions()
         {
             bool permissionsGranted = true;

@@ -20,9 +20,11 @@ namespace Social_Network_App
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
 
-    public class AvailableNetworksActivity : AppCompatActivity, BottomNavigationView.IOnNavigationItemSelectedListener
+    public class AvailableNetworksActivity : AppCompatActivity, BottomNavigationView.IOnNavigationItemSelectedListener,
     {
         private TextView textMessage;
+        private EditText passwordText;
+        private Button connectButton;
         private ListView wifiList;
         private WifiManager wifiManager;
         private WifiReceiver wifiReceiver;
@@ -36,32 +38,20 @@ namespace Social_Network_App
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_availableNetworks);
 
-            GetIDsAndPrepareDelegates();
+            AttachCallbacksAndGetIDs();
 
             navigation.SetOnNavigationItemSelectedListener(this);
             var menu = navigation.Menu;
             var menuItem = menu.GetItem(1);
+
             menuItem.SetChecked(true);
-            wifiManager = (WifiManager)ApplicationContext.GetSystemService(Context.WifiService);
-            wifiReceiver = new WifiReceiver(wifiManager, wifiList);
         }
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            buttonWifiScanner.Click -= OnAvailableWifiButtonClick;
-            buttonReceiveMessage.Click -= OnStartListeningButtonClick;
+            DettachCallbacks();
         }
-        private void GetIDsAndPrepareDelegates()
-        {
-            textMessage = FindViewById<TextView>(Resource.Id.message);
-            wifiList = FindViewById<ListView>(Resource.Id.wifiList);
-            buttonWifiScanner = FindViewById<Button>(Resource.Id.scanBtn);
-            buttonReceiveMessage = FindViewById<Button>(Resource.Id.ReceiveMessageButton);
-            buttonWifiScanner.Click += OnAvailableWifiButtonClick;
-            buttonReceiveMessage.Click += OnStartListeningButtonClick;
-            navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
-        }
-
+        
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -108,13 +98,14 @@ namespace Social_Network_App
                     textMessage.Visibility = ViewStates.Invisible;
                     Toast.MakeText(ApplicationContext, "Searching for Wi-fi...", ToastLength.Long).Show();
                     RegisterReceiver(wifiReceiver, new IntentFilter(WifiManager.ScanResultsAvailableAction));
+                    RegisterReceiver(wifiReceiver, new IntentFilter(WifiManager.SupplicantConnectionChangeAction));
                     wifiManager.StartScan();
                 }
             }
         }
         public void OnStartListeningButtonClick(object sender, System.EventArgs e)
         {
-            if (CheckWifiOnAndConnected())
+            if (Utils.CheckWifiOnAndConnected(wifiManager))
             {
                 MessageReceiver messageSender = new MessageReceiver();
                 Task<System.Net.Sockets.UdpReceiveResult> task = Task.Run<System.Net.Sockets.UdpReceiveResult>(async () => await messageSender.StartListening(ApplicationContext));
@@ -124,24 +115,26 @@ namespace Social_Network_App
                 Toast.MakeText(ApplicationContext, "Connect to any wi-fi first!", ToastLength.Long);
             }
         }
-        private bool CheckWifiOnAndConnected()
+
+        void AttachCallbacksAndGetIDs()
         {
-            WifiManager wifiMgr = (WifiManager)GetSystemService(Context.WifiService);
+            passwordText = FindViewById<EditText>(Resource.Id.passwordText);
+            connectButton = FindViewById<Button>(Resource.Id.wifiConnect);
+            textMessage = FindViewById<TextView>(Resource.Id.message);
+            wifiList = FindViewById<ListView>(Resource.Id.wifiList);
+            buttonWifiScanner = FindViewById<Button>(Resource.Id.scanBtn);
+            buttonReceiveMessage = FindViewById<Button>(Resource.Id.ReceiveMessageButton);
+            buttonWifiScanner.Click += OnAvailableWifiButtonClick;
+            buttonReceiveMessage.Click += OnStartListeningButtonClick;
+            navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
+            wifiManager = (WifiManager)ApplicationContext.GetSystemService(Context.WifiService);
+            wifiReceiver = new WifiReceiver(wifiManager, wifiList, ApplicationContext, passwordText, connectButton);
+        }
 
-            if (wifiMgr.IsWifiEnabled)
-            {
-                WifiInfo wifiInfo = wifiMgr.ConnectionInfo;
-
-                if (wifiInfo.NetworkId == -1)
-                {
-                    return false;
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+        void DettachCallbacks()
+        {
+            buttonWifiScanner.Click -= OnAvailableWifiButtonClick;
+            buttonReceiveMessage.Click -= OnStartListeningButtonClick;
         }
     }
 }

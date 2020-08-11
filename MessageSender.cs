@@ -21,7 +21,7 @@ namespace Social_Network_App
             using (var client = new UdpClient())
             {
                 client.EnableBroadcast = true;
-                var endpoint = new IPEndPoint(IPAddress.Broadcast, 15000);
+                var endpoint = new IPEndPoint(IPAddress.Broadcast, Utils.Port);
                 var message = Encoding.ASCII.GetBytes("Hello World - " + DateTime.Now.ToString());
                 return await client.SendAsync(message, message.Length, endpoint);
             }

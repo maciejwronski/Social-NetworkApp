@@ -16,7 +16,7 @@ namespace Social_Network_App
 {
     class MessageReceiver
     {
-        private readonly UdpClient _udpClient = new UdpClient(15000);
+        private readonly UdpClient _udpClient = new UdpClient(Utils.Port);
         public async System.Threading.Tasks.Task<UdpReceiveResult> StartListening(Context context)
         {
             UdpReceiveResult result;

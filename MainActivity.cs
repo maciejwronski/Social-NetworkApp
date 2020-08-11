@@ -20,13 +20,17 @@ namespace Social_Network_App
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
             RequestPermissions(Utils.RequiredWifiPermissions, 0);
-            textMessage = FindViewById<TextView>(Resource.Id.message);
+            AttachCallbacksAndGetIDs();
             BottomNavigationView navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
             navigation.SetOnNavigationItemSelectedListener(this);
             var menu = navigation.Menu;
             var menuItem = menu.GetItem(0);
             menuItem.SetChecked(true);
 
+        }
+        private void AttachCallbacksAndGetIDs()
+        {
+            textMessage = FindViewById<TextView>(Resource.Id.message);
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
