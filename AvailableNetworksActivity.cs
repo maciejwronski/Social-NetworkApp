@@ -20,7 +20,7 @@ namespace Social_Network_App
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
 
-    public class AvailableNetworksActivity : AppCompatActivity, BottomNavigationView.IOnNavigationItemSelectedListener,
+    public class AvailableNetworksActivity : AppCompatActivity, BottomNavigationView.IOnNavigationItemSelectedListener
     {
         private TextView textMessage;
         private EditText passwordText;
@@ -109,6 +109,10 @@ namespace Social_Network_App
             {
                 MessageReceiver messageSender = new MessageReceiver();
                 Task<System.Net.Sockets.UdpReceiveResult> task = Task.Run<System.Net.Sockets.UdpReceiveResult>(async () => await messageSender.StartListening(ApplicationContext));
+                task.ContinueWith(t =>
+                {
+                    Console.WriteLine("[ReceiveResult]" + t.Result);
+                });
             }
             else
             {

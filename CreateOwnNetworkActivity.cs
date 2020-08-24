@@ -86,22 +86,31 @@ namespace Social_Network_App
         }
         public void OnCreateNetworkButtonClick(object sender, System.EventArgs e)
         {
-            if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.HotSpotPermission))
+            if (localHotspot == null)
             {
-                Toast.MakeText(ApplicationContext, "Application requires some HotSpotPermissions!.", ToastLength.Long).Show();
-                RequestPermissions(Utils.RequiredHotSpotPermissions, 0);
-                return;
-            }
-            if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.LocationPermission))
-            {
-                var GetPermissions = Utils.GetPermissions();
+                if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.HotSpotPermission))
+                {
+                    Toast.MakeText(ApplicationContext, "Application requires some HotSpotPermissions!.", ToastLength.Long).Show();
+                    RequestPermissions(Utils.RequiredHotSpotPermissions, 0);
+                    return;
+                }
+                if (!Utils.HasPermission(ApplicationContext, Utils.ePermission.LocationPermission))
+                {
+                    var GetPermissions = Utils.GetPermissions();
+                }
+                else
+                {
+                    if (wifiManager.IsWifiEnabled)
+                        wifiManager.SetWifiEnabled(false);
+                    localHotspot = new LocalHotspot(ApplicationContext);
+                    localHotspot.SetNetworkState(true);
+                }
             }
             else
             {
-                if (wifiManager.IsWifiEnabled)
-                    wifiManager.SetWifiEnabled(false);
-                localHotspot = new LocalHotspot(ApplicationContext);
-                localHotspot.SetNetworkState(true);
+                Console.WriteLine("Disabling hotspot");
+                localHotspot.SetNetworkState(false);
+                localHotspot = null;
             }
         }
 
@@ -113,29 +122,45 @@ namespace Social_Network_App
                 {
                     case HotSpotState.Disabled:
                         buttonSendMessage.Visibility = ViewStates.Invisible;
-                        buttonCreateHotspot.Visibility = ViewStates.Visible;
+                        buttonCreateHotspot.Text = Utils.TurnHotspotOnMessage;
+                        ShowWifiParameters(false);
                         break;
                     case HotSpotState.Enabled:
                         buttonSendMessage.Visibility = ViewStates.Visible;
-                        buttonCreateHotspot.Visibility = ViewStates.Invisible;
+                        buttonCreateHotspot.Text = Utils.TurnHotspotOffMessage;
+                        ShowWifiParameters(true);
                         break;
                 }
             }
         }
 
-        public void OnMessageSendButtonClick(object sender, System.EventArgs e)
+        private void OnMessageSendButtonClick(object sender, System.EventArgs e)
         {
             if(localHotspot != null && localHotspot.GetHotSpotState() == HotSpotState.Enabled)
             {
                 MessageSender messageSender = new MessageSender();
                 string testMessage = "Test";
                 Task<int> task = Task.Run<int>(async () => await messageSender.SendBroadcastMessage(ApplicationContext, testMessage));
-                Console.WriteLine(task.Result);
+                task.ContinueWith(t =>
+                {
+                    Console.WriteLine("[SendResult]" + t.Result);
+                });
             }
             else
             {
-                Console.WriteLine((localHotspot == null) + " " + (localHotspot.GetHotSpotState()));
+                Console.WriteLine("[OwnNetworkActivity]" + (localHotspot == null) + " " + (localHotspot.GetHotSpotState()));
                 Toast.MakeText(ApplicationContext, "Enable Hot-Spot first!", ToastLength.Long);
+            }
+        }
+        private void ShowWifiParameters(bool state)
+        {
+            if (!state)
+            {
+                textMessage.Text = "Press the button to create own network activity";
+            }
+            else
+            {
+                textMessage.Text = ("SSID: " + localHotspot.GetWifiConfig().Item1 + "\n" + "Password: " + localHotspot.GetWifiConfig().Item2);
             }
         }
         

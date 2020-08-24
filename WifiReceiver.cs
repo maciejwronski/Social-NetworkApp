@@ -161,7 +161,7 @@ namespace Social_Network_App
         }
         private void DettachCallbacks()
         {
-            ClearWifiListView();
+            ClearWifiListView(); 
             wifiDeviceListView.ItemClick -= OnItemClick;
             _connectButton.Click -= OnConnectClick;
         }

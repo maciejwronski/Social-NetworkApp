@@ -27,6 +27,8 @@ namespace Social_Network_App
         Context context;
         HotSpotCallback callback;
         private HotSpotState hotSpotState = HotSpotState.Disabled;
+        private string _wifiPassword;
+        private string _wifiSSID;
         public static event EventHandler<HotSpotState> StateChange;
         public HotSpotState HotSpotState {
             get {
@@ -72,13 +74,22 @@ namespace Social_Network_App
         }
         public HotSpotState GetHotSpotState()
         {
-            Console.WriteLine(wifiManager.ConnectionInfo + " " + wifiManager.DhcpInfo);
+            Console.WriteLine("[Connection info] " + wifiManager.ConnectionInfo + " " + wifiManager.DhcpInfo);
             return HotSpotState;
         }
         protected virtual void OnStateChanged(HotSpotState hotSpotState)
         {
-            Console.WriteLine("State changed to: " + hotSpotState);
+            Console.WriteLine("[State] changed to: " + hotSpotState);
             StateChange?.Invoke(this, hotSpotState);
+        }
+        public Tuple<string, string> GetWifiConfig()
+        {
+            return new Tuple<string, string>(_wifiSSID, _wifiPassword);
+        }
+        public void SetWifiConfig(string ssid, string pass)
+        {
+            _wifiSSID = ssid;
+            _wifiPassword = pass;
         }
     }
 }
