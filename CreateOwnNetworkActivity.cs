@@ -100,6 +100,8 @@ namespace Social_Network_App
                 }
                 else
                 {
+                    buttonCreateHotspot.Visibility = ViewStates.Invisible;
+                    textMessage.Text = Utils.PleaseWaitMessage;
                     if (wifiManager.IsWifiEnabled)
                         wifiManager.SetWifiEnabled(false);
                     localHotspot = new LocalHotspot(ApplicationContext);
@@ -108,7 +110,7 @@ namespace Social_Network_App
             }
             else
             {
-                Console.WriteLine("Disabling hotspot");
+
                 localHotspot.SetNetworkState(false);
                 localHotspot = null;
             }
@@ -118,6 +120,7 @@ namespace Social_Network_App
         {
             if(localHotspot != null)
             {
+                buttonCreateHotspot.Visibility = ViewStates.Visible;
                 switch (localHotspot.GetHotSpotState())
                 {
                     case HotSpotState.Disabled:

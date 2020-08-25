@@ -14,6 +14,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using Android.Views.InputMethods;
 using Android.Net;
+using Xamarin.Essentials;
 
 namespace Social_Network_App
 {
@@ -23,87 +24,56 @@ namespace Social_Network_App
         Context _context;
         EditText _password;
         Button _connectButton;
-        Dictionary<int, string> wifiDictionary;
-        ListView wifiDeviceListView;
-
+        Dictionary<int, string> _wifiDictionary;
+        ListView _wifiDeviceListView;
+        WifiConnector wifiConnector;
+        public event EventHandler<NetworkAccess> StateChange;
         int currentItemID;
         public WifiReceiver(WifiManager wifiManager, Android.Widget.ListView wifiDeviceList, Context context, EditText pass, Button connectButton)
         {
             _wifiManager = wifiManager;
-            wifiDeviceListView = wifiDeviceList;
+            _wifiDeviceListView = wifiDeviceList;
             _context = context;
             _password = pass;
             _connectButton = connectButton;
+            AttachCallbacks();
+            ShowButtonConnectState(true, true);
+        }
+        ~WifiReceiver()
+        {
+            DettachCallbacks();
         }
         public override void OnReceive(Context context, Intent intent)
         {
             String action = intent.Action;
-            if (action == WifiManager.ScanResultsAvailableAction)
+            if (action == WifiManager.ScanResultsAvailableAction && !Utils.CheckWifiOnAndConnected(_wifiManager))
                 FillListViewWithWifi(context);
-            if (action == WifiManager.SupplicantConnectionChangeAction)
-            {
-                ConnectivityManager conMan = (ConnectivityManager)_context.GetSystemService(Context.ConnectivityService);
-                NetworkInfo netInfo = conMan.ActiveNetworkInfo;
-                if (netInfo != null)
-                    Console.WriteLine((netInfo.IsAvailable) + " " + (netInfo.IsConnected));
-                if ((intent.GetBooleanExtra(WifiManager.ExtraSupplicantConnected, false)))
-                {
-                    Console.WriteLine("Connected to wifi!");
-                    ShowButtonConnectState(false);
-                }
-                else
-                {
-                    Console.WriteLine("Wifi connection lost");
-                    ShowButtonConnectState(false, true);
-                }
-            }
         }
         private void ConnectToWifi(string networkSSID, string networkPass)
         {
-            Console.WriteLine("trying to connect to wifi " + networkSSID + " " + networkPass);
-            var config = new WifiConfiguration();
-            config.Ssid = '"' + networkSSID + '"';
-            config.PreSharedKey = '"' + networkPass + '"';
-            int id = _wifiManager.AddNetwork(config);
-            _wifiManager.Disconnect();
-            _wifiManager.EnableNetwork(id, true);
-            _wifiManager.Reconnect();
+            wifiConnector = new WifiConnector(networkSSID, networkPass, _wifiManager);
+            wifiConnector.ConnectToWifi();
         }
         private void OnConnectClick(object sender, EventArgs e)
         {
             if (_connectButton.Text == "Connect")
             {
-                InputMethodManager imm = (InputMethodManager)_context.GetSystemService(Context.InputMethodService);
-                imm.HideSoftInputFromWindow(_password.WindowToken, 0);
-
-                if (wifiDictionary.ContainsKey(currentItemID))
+                HideVirtualKeyboard();
+                if (_wifiDictionary.ContainsKey(currentItemID))
                 {
-                    ConnectToWifi(wifiDictionary[currentItemID], _password.Text);
+                    ConnectToWifi(_wifiDictionary[currentItemID], _password.Text);
                 }
             }
             else
             {
-                Console.WriteLine("Disabling network");
-                _wifiManager.DisableNetwork(_wifiManager.ConnectionInfo.NetworkId);
-                _wifiManager.Disconnect();
+                if(wifiConnector != null)
+                    wifiConnector.DisconnectFromWifi();
                 ClearWifiListView();
                 ShowButtonConnectState(false, true);
-
             }
         }
 
-        private void OnItemClick(object sender, AdapterView.ItemClickEventArgs e)
-        {
-            currentItemID = (int)e.Id;
-            _password.RequestFocus();
-            _password.SelectAll();
-
-            InputMethodManager inputMethodManager = _context.GetSystemService(Context.InputMethodService) as InputMethodManager;
-            inputMethodManager.ShowSoftInput(_password, ShowFlags.Forced);
-            inputMethodManager.ToggleSoftInput(ShowFlags.Forced, HideSoftInputFlags.ImplicitOnly);
-        }
-
-        private void ShowButtonConnectState(bool state, bool hideAll = false)
+        public void ShowButtonConnectState(bool connect, bool hideAll = false)
         {
             if (hideAll)
             {
@@ -112,7 +82,7 @@ namespace Social_Network_App
                 _connectButton.Text = "Connect";
                 return;
             }
-            if (!state)
+            if (!connect)
             {
                 _connectButton.Visibility = ViewStates.Visible;
                 _password.Visibility = ViewStates.Invisible;
@@ -125,45 +95,80 @@ namespace Social_Network_App
                 _connectButton.Text = "Connect";
             }
         }
+        private void Connectivity_ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)
+        {
+            OnStateChanged(e.NetworkAccess);
+            switch (e.NetworkAccess)
+            {
+                case NetworkAccess.Internet:
+                    ShowButtonConnectState(false);
+                    ClearWifiListView();
+                    _password.Text = "";
+                    break;
+                case NetworkAccess.None:
+                    ShowButtonConnectState(true);
+                    break;
+            }
+
+        }
         private void FillListViewWithWifi(Context context)
         {
-            wifiDictionary = new Dictionary<int, string>();
+            _wifiDictionary = new Dictionary<int, string>();
             StringBuilder sb = new StringBuilder();
             ArrayList deviceList = new ArrayList();
             IList<ScanResult> wifiList = _wifiManager.ScanResults;
             int index = 0;
             foreach (ScanResult scanResult in wifiList)
             {
-                wifiDictionary.Add(index, scanResult.Ssid);
+                _wifiDictionary.Add(index, scanResult.Ssid);
                 sb.Append("\n").Append(scanResult.Ssid).Append(" - ").Append(scanResult.Capabilities);
                 deviceList.Add(scanResult.Ssid);
+                index++;
             }
             ArrayAdapter arrayAdapter = new ArrayAdapter(context, Android.Resource.Layout.SimpleExpandableListItem1, deviceList.ToArray());
-            wifiDeviceListView.Adapter = arrayAdapter;
-            AttachCallbacks();
+            _wifiDeviceListView.Adapter = arrayAdapter;
+        }
+        private void OnItemClick(object sender, AdapterView.ItemClickEventArgs e)
+        {
+            ShowButtonConnectState(true);
+            currentItemID = (int)e.Id;
+            _password.RequestFocus();
+            _password.SelectAll();
 
-            if (Utils.CheckWifiOnAndConnected(_wifiManager))
-            {
-                ShowButtonConnectState(false);
-            }
-            else
-                ShowButtonConnectState(true);
+            ShowVirtualKeyboard();
+        }
+        private void ShowVirtualKeyboard()
+        {
+            InputMethodManager inputMethodManager = _context.GetSystemService(Context.InputMethodService) as InputMethodManager;
+            inputMethodManager.ShowSoftInput(_password, ShowFlags.Forced);
+            inputMethodManager.ToggleSoftInput(ShowFlags.Forced, HideSoftInputFlags.ImplicitOnly);
+        }
+        private void HideVirtualKeyboard()
+        {
+            InputMethodManager imm = (InputMethodManager)_context.GetSystemService(Context.InputMethodService);
+            imm.HideSoftInputFromWindow(_password.WindowToken, 0);
         }
         private void ClearWifiListView()
         {
-            wifiDeviceListView.Adapter = null;
-            wifiDictionary = new Dictionary<int, string>();
+            _wifiDeviceListView.Adapter = null;
+            _wifiDictionary = new Dictionary<int, string>();
         }
         private void AttachCallbacks()
         {
-            wifiDeviceListView.ItemClick += OnItemClick;
+            _wifiDeviceListView.ItemClick += OnItemClick;
             _connectButton.Click += OnConnectClick;
+            Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
         }
         private void DettachCallbacks()
         {
             ClearWifiListView(); 
-            wifiDeviceListView.ItemClick -= OnItemClick;
+            _wifiDeviceListView.ItemClick -= OnItemClick;
             _connectButton.Click -= OnConnectClick;
+            Connectivity.ConnectivityChanged -= Connectivity_ConnectivityChanged;
+        }
+        protected virtual void OnStateChanged(NetworkAccess networkAccess)
+        {
+            StateChange?.Invoke(this, networkAccess);
         }
     }
 }

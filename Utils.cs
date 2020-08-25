@@ -19,6 +19,7 @@ namespace Social_Network_App
         public static int Port = 15000;
         public static string TurnHotspotOffMessage = "Turn the hotspot Off";
         public static string TurnHotspotOnMessage = "CREATE OWN NETWORK";
+        public static string PleaseWaitMessage = "Please wait...";
         public enum ePermission
         {
             LocationPermission,

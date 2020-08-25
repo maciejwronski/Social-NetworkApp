@@ -20,14 +20,12 @@ public class HotSpotCallback : Android.Net.Wifi.WifiManager.LocalOnlyHotspotCall
     public override void OnStopped()
     {
         base.OnStopped();
-        Console.WriteLine("Hotspot off");
         _hotSpot.SetWifiConfig(null,null);
         _hotSpot.HotSpotState = Social_Network_App.HotSpotState.Enabled;
     }
     public override void OnFailed([GeneratedEnum] LocalOnlyHotspotCallbackErrorCode reason)
     {
         base.OnFailed(reason);
-        Console.WriteLine("Hotspot failed with error " + reason.ToString());
         _hotSpot.SetWifiConfig(null, null);
         _hotSpot.HotSpotState = Social_Network_App.HotSpotState.Disabled;
     }
