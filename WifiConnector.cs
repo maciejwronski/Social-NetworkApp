@@ -23,6 +23,7 @@ namespace Social_Network_App
         {
             _wifiSsid = wifiSsid;
             _wifiPassword = wifiPassword;
+            _wifiManager = wifiManager;
         }
         public void ConnectToWifi()
         {

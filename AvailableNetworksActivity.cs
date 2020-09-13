@@ -131,12 +131,9 @@ namespace Social_Network_App
             if (Utils.CheckWifiOnAndConnected(wifiManager))
             {
                 Console.WriteLine("Listening for any messages...");
-                MessageReceiver messageSender = new MessageReceiver();
-                Task<System.Net.Sockets.UdpReceiveResult> task = Task.Run<System.Net.Sockets.UdpReceiveResult>(async () => await messageSender.StartListening(ApplicationContext));
-                task.ContinueWith(t =>
-                {
-                    Console.WriteLine("[ReceiveResult]" + t.Result);
-                });
+                Console.WriteLine(wifiManager.DhcpInfo);
+                MessageReceiver messageReceiver = new MessageReceiver();
+                messageReceiver.StartListening(Application.Context);
             }
             else
             {
@@ -151,12 +148,14 @@ namespace Social_Network_App
                 case NetworkAccess.Internet:
                     buttonReceiveMessage.Visibility = ViewStates.Visible;
                     buttonWifiScanner.Visibility = ViewStates.Invisible;
+                    connectButton.Visibility = ViewStates.Invisible;
                     UnregisterReceiver(wifiReceiver);
                     wifiReceiver = null;
                     break;
                 default:
                     buttonReceiveMessage.Visibility = ViewStates.Invisible;
                     buttonWifiScanner.Visibility = ViewStates.Visible;
+                    connectButton.Visibility = ViewStates.Invisible;
                     break;
             }
         }

@@ -17,6 +17,7 @@ namespace Social_Network_App
     public static class Utils
     {
         public static int Port = 15000;
+        public static int MAX_BYTES = 1024;
         public static string TurnHotspotOffMessage = "Turn the hotspot Off";
         public static string TurnHotspotOnMessage = "CREATE OWN NETWORK";
         public static string PleaseWaitMessage = "Please wait...";

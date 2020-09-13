@@ -11,19 +11,51 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using static Android.Arch.Lifecycle.Lifecycle;
 
 namespace Social_Network_App
 {
     class MessageSender
     {
-        public async System.Threading.Tasks.Task<int> SendBroadcastMessage(Context context, string text)
+        Socket _socketBroadcast = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        IPEndPoint ipEndPointBroadcast = new IPEndPoint(IPAddress.Parse("192.168.43.1"), Utils.Port);
+        IAsyncResult sendResultBroadcast;
+        public void BroadcastMessage(Context context, string text)
         {
-            using (var client = new UdpClient())
+            try
             {
-                client.EnableBroadcast = true;
-                var endpoint = new IPEndPoint(IPAddress.Broadcast, Utils.Port);
-                var message = Encoding.ASCII.GetBytes("Hello World - " + DateTime.Now.ToString());
-                return await client.SendAsync(message, message.Length, endpoint);
+                byte[] send_buffer = Encoding.ASCII.GetBytes(Crypto.VigenereCrypt.Code(text));
+                BroadCastMethod(send_buffer);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in sending asynchronous message" + ex.Message);
+            }
+        }
+        private void BroadCastMethod(byte[] bufferToSend)
+        {
+            try
+            {
+                _socketBroadcast.EnableBroadcast = true;
+                _socketBroadcast.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                _socketBroadcast.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontRoute, true);
+                sendResultBroadcast = _socketBroadcast.BeginSendTo(bufferToSend, 0, bufferToSend.Length, SocketFlags.Broadcast, ipEndPointBroadcast, new AsyncCallback(SendCompletedBroadcast), _socketBroadcast);
+            }
+            catch(Exception s)
+            {
+                Console.WriteLine("[Exception in broadcast prepare]: " + s.Message);
+            }
+        }
+        private void SendCompletedBroadcast(IAsyncResult ar)
+        {
+            try
+            {
+                Console.WriteLine("--Closing socket--" + ar.IsCompleted);
+                _socketBroadcast.EndSendTo(ar);
+            }
+            catch (Exception s)
+            {
+                Console.WriteLine("[Exception Complete Broadcast]" + s.Message + " " +s.InnerException);
             }
         }
     }

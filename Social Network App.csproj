@@ -45,6 +45,7 @@
     <EnableLLVM>false</EnableLLVM>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidSupportedAbis>armeabi-v7a;x86</AndroidSupportedAbis>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -77,6 +78,7 @@
     <Compile Include="CreateOwnNetworkActivity.cs" />
     <Compile Include="AvailableNetworksActivity.cs" />
     <Compile Include="MainActivity.cs" />
+    <Compile Include="VigenereCrypt.cs" />
     <Compile Include="MessageReceiver.cs" />
     <Compile Include="MessageSender.cs" />
     <Compile Include="Resources\Resource.designer.cs" />

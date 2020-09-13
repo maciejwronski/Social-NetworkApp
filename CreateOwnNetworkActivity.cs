@@ -24,6 +24,7 @@ namespace Social_Network_App
         TextView textMessage;
         WifiManager wifiManager;
         LocalHotspot localHotspot;
+        MessageSender messageSender;
         private Button buttonCreateHotspot;
         private Button buttonSendMessage;
         protected override void OnCreate(Bundle savedInstanceState)
@@ -141,13 +142,11 @@ namespace Social_Network_App
         {
             if(localHotspot != null && localHotspot.GetHotSpotState() == HotSpotState.Enabled)
             {
-                MessageSender messageSender = new MessageSender();
+
+                if(messageSender == null)
+                    messageSender = new MessageSender();
                 string testMessage = "Test";
-                Task<int> task = Task.Run<int>(async () => await messageSender.SendBroadcastMessage(ApplicationContext, testMessage));
-                task.ContinueWith(t =>
-                {
-                    Console.WriteLine("[SendResult]" + t.Result);
-                });
+                messageSender.BroadcastMessage(ApplicationContext, testMessage);
             }
             else
             {
@@ -163,6 +162,7 @@ namespace Social_Network_App
             }
             else
             {
+                Console.WriteLine(wifiManager.DhcpInfo);
                 textMessage.Text = ("SSID: " + localHotspot.GetWifiConfig().Item1 + "\n" + "Password: " + localHotspot.GetWifiConfig().Item2);
             }
         }
