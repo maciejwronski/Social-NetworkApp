@@ -24,7 +24,6 @@ namespace Social_Network_App
         TextView textMessage;
         WifiManager wifiManager;
         LocalHotspot localHotspot;
-        MessageSender messageSender;
         private Button buttonCreateHotspot;
         private Button buttonSendMessage;
         protected override void OnCreate(Bundle savedInstanceState)
@@ -43,8 +42,8 @@ namespace Social_Network_App
         }
         protected override void OnDestroy()
         {
-            base.OnDestroy();
             DettachCallbacks();
+            base.OnDestroy();
         }
         private void AttachCallbacksAndIDs()
         {
@@ -58,6 +57,11 @@ namespace Social_Network_App
         }
         private void DettachCallbacks()
         {
+            if (localHotspot != null)
+            {
+                localHotspot.SetNetworkState(false);
+                localHotspot = null;
+            }
             buttonCreateHotspot.Click -= OnCreateNetworkButtonClick;
             buttonSendMessage.Click -= OnMessageSendButtonClick;
             LocalHotspot.StateChange -= OnHotspotStateChange;
@@ -143,10 +147,14 @@ namespace Social_Network_App
             if(localHotspot != null && localHotspot.GetHotSpotState() == HotSpotState.Enabled)
             {
 
-                if(messageSender == null)
-                    messageSender = new MessageSender();
-                string testMessage = "Test";
-                messageSender.BroadcastMessage(ApplicationContext, testMessage);
+                //if(messageSender == null)
+                //    messageSender = new MessageSender();
+                //string testMessage = "Test";
+                //messageSender.BroadcastMessage(ApplicationContext, testMessage);
+                Console.WriteLine(wifiManager.DhcpInfo);
+                MessageReceiver messageReceiver = new MessageReceiver();
+                messageReceiver.StartListening(Application.Context);
+
             }
             else
             {

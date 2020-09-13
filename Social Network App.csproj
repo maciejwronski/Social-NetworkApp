@@ -73,6 +73,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurrentMessageHandler.cs" />
     <Compile Include="HotSpotCallback.cs" />
     <Compile Include="LocalHotspot.cs" />
     <Compile Include="CreateOwnNetworkActivity.cs" />

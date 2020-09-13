@@ -21,6 +21,7 @@ namespace Social_Network_App
         public static string TurnHotspotOffMessage = "Turn the hotspot Off";
         public static string TurnHotspotOnMessage = "CREATE OWN NETWORK";
         public static string PleaseWaitMessage = "Please wait...";
+        public static string TestMessage = "Test Message";
         public enum ePermission
         {
             LocationPermission,

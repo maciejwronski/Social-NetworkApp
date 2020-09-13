@@ -24,7 +24,7 @@ namespace Social_Network_App
         {
             try
             {
-                byte[] send_buffer = Encoding.ASCII.GetBytes(Crypto.VigenereCrypt.Code(text));
+                byte[] send_buffer = Encoding.ASCII.GetBytes(text);
                 BroadCastMethod(send_buffer);
             }
             catch (Exception ex)
@@ -39,7 +39,7 @@ namespace Social_Network_App
                 _socketBroadcast.EnableBroadcast = true;
                 _socketBroadcast.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 _socketBroadcast.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontRoute, true);
-                sendResultBroadcast = _socketBroadcast.BeginSendTo(bufferToSend, 0, bufferToSend.Length, SocketFlags.Broadcast, ipEndPointBroadcast, new AsyncCallback(SendCompletedBroadcast), _socketBroadcast);
+                sendResultBroadcast = _socketBroadcast.BeginSendTo(bufferToSend, 0, bufferToSend.Length, SocketFlags.None, ipEndPointBroadcast, new AsyncCallback(SendCompletedBroadcast), _socketBroadcast);
             }
             catch(Exception s)
             {
@@ -51,7 +51,7 @@ namespace Social_Network_App
             try
             {
                 Console.WriteLine("--Closing socket--" + ar.IsCompleted);
-                _socketBroadcast.EndSendTo(ar);
+                //_socketBroadcast.EndSendTo(ar);
             }
             catch (Exception s)
             {

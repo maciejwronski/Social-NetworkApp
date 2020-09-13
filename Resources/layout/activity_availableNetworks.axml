@@ -52,7 +52,7 @@
         android:layout_alignParentBottom = "false"
         android:layout_gravity = "center"
         android:layout_margin = "60dp"
-        android:text="Receive Message"
+        android:text="Send Message"
         android:onClick="OnStartListeningButtonClick"
         android:visibility="visible" 
     />

@@ -15,6 +15,7 @@ using Xamarin.Essentials;
 using Plugin.Permissions;
 using Plugin.CurrentActivity;
 using System.Threading.Tasks;
+using Java.Lang;
 
 namespace Social_Network_App
 {
@@ -49,14 +50,26 @@ namespace Social_Network_App
         }
         protected override void OnDestroy()
         {
-            base.OnDestroy();
             DettachCallbacks();
+            base.OnDestroy();
         }
         void DettachCallbacks()
         {
-            buttonWifiScanner.Click -= OnAvailableWifiButtonClick;
-            buttonReceiveMessage.Click -= OnStartListeningButtonClick;
-            wifiReceiver.StateChange -= OnConnectionStateChanged;
+            if(buttonWifiScanner != null)
+                buttonWifiScanner.Click -= OnAvailableWifiButtonClick;
+            if(buttonReceiveMessage != null)
+                buttonReceiveMessage.Click -= OnStartListeningButtonClick;
+            if (wifiReceiver != null)
+                wifiReceiver.StateChange -= OnConnectionStateChanged;
+            try
+            {
+                UnregisterReceiver(wifiReceiver);
+                wifiReceiver = null;
+            }
+            catch (IllegalArgumentException ex)
+            {
+                Console.WriteLine("Most like receiver was null" + ex.Message);
+            }
         }
         void AttachCallbacksAndGetIDs()
         {
@@ -130,10 +143,16 @@ namespace Social_Network_App
         {
             if (Utils.CheckWifiOnAndConnected(wifiManager))
             {
-                Console.WriteLine("Listening for any messages...");
-                Console.WriteLine(wifiManager.DhcpInfo);
-                MessageReceiver messageReceiver = new MessageReceiver();
-                messageReceiver.StartListening(Application.Context);
+                Console.WriteLine("Sending a message...");
+                var messageSender = new MessageSender();
+
+                string messageToSend = "";
+                if (!CurrentMessageHandler.ContainsMessage())
+                    messageToSend = Crypto.VigenereCrypt.Code(Utils.TestMessage); // is the first person, that wants to send message. lets decrypt it
+                else
+                    messageToSend = CurrentMessageHandler.GetCurrentMessage(); // message is already decrypted, because already has been received.
+
+                messageSender.BroadcastMessage(ApplicationContext, messageToSend);
             }
             else
             {
@@ -149,8 +168,15 @@ namespace Social_Network_App
                     buttonReceiveMessage.Visibility = ViewStates.Visible;
                     buttonWifiScanner.Visibility = ViewStates.Invisible;
                     connectButton.Visibility = ViewStates.Invisible;
-                    UnregisterReceiver(wifiReceiver);
-                    wifiReceiver = null;
+                    try
+                    {
+                        UnregisterReceiver(wifiReceiver);
+                        wifiReceiver = null;
+                    }
+                    catch(IllegalArgumentException ex)
+                    {
+                        Console.WriteLine("Most like receiver was null" + ex.Message);
+                    }
                     break;
                 default:
                     buttonReceiveMessage.Visibility = ViewStates.Invisible;

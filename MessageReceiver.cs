@@ -11,6 +11,8 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Plugin.CurrentActivity;
+using Xamarin.Essentials;
 
 namespace Social_Network_App
 {
@@ -47,7 +49,7 @@ namespace Social_Network_App
                 EndPoint epb = (EndPoint)ipEndPointBroadcast;
                 _socketb.Bind(epb);
                 _socketb.EnableBroadcast = true;
-                receiveResultBroadcast = _socketb.BeginReceiveFrom(state.buffer, 0, 1024, SocketFlags.Broadcast, ref epb, new AsyncCallback(ReceiveCompleteBroadcast), state);
+                receiveResultBroadcast = _socketb.BeginReceiveFrom(state.buffer, 0, 1024, SocketFlags.None, ref epb, new AsyncCallback(ReceiveCompleteBroadcast), state);
             }
             catch (Exception s)
             {
@@ -62,7 +64,7 @@ namespace Social_Network_App
                 EndPoint ep = (EndPoint)ipEndPointBroadcast;
                 int bytes = _socketb.EndReceiveFrom(receiveResultBroadcast, ref ep);
                 Console.WriteLine("RECV: {0}: {1}, {2}", ep.ToString(), bytes, Encoding.ASCII.GetString(so.buffer, 0, bytes));
-                Toast.MakeText(context, "Received text: " + Crypto.VigenereCrypt.Decode(System.Text.Encoding.UTF8.GetString(so.buffer)).ToString(), ToastLength.Long);
+                CurrentMessageHandler.SetMessage(ep.ToString(), Encoding.ASCII.GetString(so.buffer, 0, bytes));
                 _socketb.Close();
             }
             catch (Exception s)
