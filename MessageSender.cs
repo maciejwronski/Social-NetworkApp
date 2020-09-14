@@ -20,12 +20,11 @@ namespace Social_Network_App
         Socket _socketBroadcast = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         IPEndPoint ipEndPointBroadcast = new IPEndPoint(IPAddress.Parse("192.168.43.1"), Utils.Port);
         IAsyncResult sendResultBroadcast;
-        public void BroadcastMessage(Context context, string text)
+        public void BroadcastMessage(Context context, byte[] buffer)
         {
             try
             {
-                byte[] send_buffer = Encoding.ASCII.GetBytes(text);
-                BroadCastMethod(send_buffer);
+                BroadCastMethod(buffer);
             }
             catch (Exception ex)
             {

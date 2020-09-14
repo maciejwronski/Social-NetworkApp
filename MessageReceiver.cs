@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 using Android.App;
@@ -64,13 +66,35 @@ namespace Social_Network_App
                 EndPoint ep = (EndPoint)ipEndPointBroadcast;
                 int bytes = _socketb.EndReceiveFrom(receiveResultBroadcast, ref ep);
                 Console.WriteLine("RECV: {0}: {1}, {2}", ep.ToString(), bytes, Encoding.ASCII.GetString(so.buffer, 0, bytes));
-                CurrentMessageHandler.SetMessage(ep.ToString(), Encoding.ASCII.GetString(so.buffer, 0, bytes));
+                ArrivedMessageHandler(ep.ToString(), so.buffer);
                 _socketb.Close();
             }
             catch (Exception s)
             {
                 Console.WriteLine("Error in broadcast listening " + s.Message);
             }
+        }
+        void ArrivedMessageHandler(string sender, byte[] buffer)
+        {
+            UserMessageContainer.userMessages.AddRange(DeserializeMessageArray(buffer));
+            if (UserMessageContainer.GetLastUserMessage() != null && UserMessageContainer.GetLastUserMessage().GetSenderIP() == "")
+            {
+                if (!UserMessageContainer.GetLastUserMessage().ContainsMessage())
+                    UserMessageContainer.userMessages.RemoveAt(UserMessageContainer.Count() - 1); // removing - its empty ( someone is just a sender-extender)
+                else
+                    UserMessageContainer.GetLastUserMessage().SetSender(sender.ToString()); // someone send message - lets write save his ip.
+            }
+            UserMessageContainer.PrintAllMessages();
+        }
+        List<UserMessage> DeserializeMessageArray(byte[] array)
+        {
+            var mStream = new MemoryStream();
+            var binFormatter = new BinaryFormatter();
+
+            mStream.Write(array, 0, array.Length);
+            mStream.Position = 0;
+
+            return binFormatter.Deserialize(mStream) as List<UserMessage>;
         }
     }
 }

@@ -73,12 +73,13 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CurrentMessageHandler.cs" />
+    <Compile Include="UserMessage.cs" />
     <Compile Include="HotSpotCallback.cs" />
     <Compile Include="LocalHotspot.cs" />
     <Compile Include="CreateOwnNetworkActivity.cs" />
     <Compile Include="AvailableNetworksActivity.cs" />
     <Compile Include="MainActivity.cs" />
+    <Compile Include="UserMessageContainer.cs" />
     <Compile Include="VigenereCrypt.cs" />
     <Compile Include="MessageReceiver.cs" />
     <Compile Include="MessageSender.cs" />

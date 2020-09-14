@@ -16,6 +16,8 @@ using Plugin.Permissions;
 using Plugin.CurrentActivity;
 using System.Threading.Tasks;
 using Java.Lang;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace Social_Network_App
 {
@@ -68,7 +70,7 @@ namespace Social_Network_App
             }
             catch (IllegalArgumentException ex)
             {
-                Console.WriteLine("Most like receiver was null" + ex.Message);
+                Console.WriteLine("Most likely receiver was null" + ex.Message);
             }
         }
         void AttachCallbacksAndGetIDs()
@@ -146,13 +148,11 @@ namespace Social_Network_App
                 Console.WriteLine("Sending a message...");
                 var messageSender = new MessageSender();
 
-                string messageToSend = "";
-                if (!CurrentMessageHandler.ContainsMessage())
-                    messageToSend = Crypto.VigenereCrypt.Code(Utils.TestMessage); // is the first person, that wants to send message. lets decrypt it
-                else
-                    messageToSend = CurrentMessageHandler.GetCurrentMessage(); // message is already decrypted, because already has been received.
+                UserMessageContainer.userMessages.Add(new UserMessage("", Crypto.VigenereCrypt.Code(Utils.MessageToSend)));
 
-                messageSender.BroadcastMessage(ApplicationContext, messageToSend);
+                messageSender.BroadcastMessage(ApplicationContext, SerializeMessageArray(UserMessageContainer.userMessages));
+                if (UserMessageContainer.CleanMessagesOnSend)
+                    UserMessageContainer.userMessages.Clear();
             }
             else
             {
@@ -185,7 +185,13 @@ namespace Social_Network_App
                     break;
             }
         }
-
+        byte[] SerializeMessageArray(List<UserMessage> list)
+        {
+            var binFormatter = new BinaryFormatter();
+            var mStream = new MemoryStream();
+            binFormatter.Serialize(mStream, list);
+            return mStream.ToArray();
+        }
         void ClearConnections()
         {
             // lets assume that you are not connected to any wi-fi at start
